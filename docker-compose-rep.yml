@@ -1,0 +1,40 @@
+version: '3'
+
+networks:
+  appollo-mongo:
+
+services:
+  node-backend:
+    build: ./node-backend/
+    container_name: node-backend
+    networks:
+      - appollo-mongo
+    ports:
+      - 3000:3000
+      - 3001:3001
+    volumes:
+      - ./node-backend/:/usr/src/app
+    command: "npm config set save=true"
+    command: "npm config set save-exact=true"
+    command: "cat ~/.npmrc"
+    command: "npm install"
+    command: "nodemon -L start"
+    restart: always
+
+  adminmongo:
+    image: "mrvautin/adminmongo"
+    container_name: adminmongo
+    networks:
+      - appollo-mongo
+    ports:
+      - "1234:1234"
+    restart: always
+
+  mongodb:
+    image: "mongo"
+    container_name: mongodb
+    networks:
+      - appollo-mongo
+    ports:
+      - "27017:27017"
+    restart: always

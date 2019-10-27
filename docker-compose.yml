@@ -1,0 +1,75 @@
+version: '3'
+
+networks:
+  appollo-mongo:
+
+services:
+  node-backend:
+    build: ./node-backend/
+    container_name: node-backend
+    networks:
+      - appollo-mongo
+    depends_on:
+      - mongodb
+    ports:
+      - 3000:3000
+      - 3001:3001
+    volumes:
+      - ./node-backend/:/usr/src/app
+    command: "npm config set save=true"
+    command: "npm config set save-exact=true"
+    # command: "cat /root/.npmrc"
+    # command: "yarn install"
+    # command: "nodemon -L start"
+    command: "yarn dev"
+    restart: always
+
+# mongo -u root -p  example --authenticationDatabase admin some-db
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   networks:
+  #     - appollo-mongo
+  #   ports:
+  #     - 8081:8081
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: root
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=false
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_MONGODB_AUTH_USERNAME=adminuser
+      - ME_CONFIG_MONGODB_AUTH_PASSWORD=adminpassword
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass
+    depends_on:
+      - mongodb
+    ports:
+      - "8888:8081"
+    restart: always
+    networks:
+      - appollo-mongo
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    networks:
+      - appollo-mongo
+    environment:
+        MONGO_INITDB_ROOT_USERNAME: adminuser
+        MONGO_INITDB_ROOT_PASSWORD: adminpassword
+        MONGO_INITDB_DATABASE: databasetocreate
+    ports:
+        - 27017:27017
+    volumes:
+        - ./mongo-config/config:/docker-entrypoint-initdb.d:ro
+
+    # MONGODB_USER: "${db_user_env}"
+    # MONGODB_DATABASE: "${dbname_env}"
+    # MONGODB_PASS: "${db_pass}"
