@@ -22,9 +22,13 @@ export default gql`
     totalPages: Int!
   }
 
+  type Subscription {
+    categoryAdded: Category
+  }
+
   extend type Query {
     category(id: ID!): Category!
-    categories(pagination: Pagination): PaginatedCategories
+    categories(page: Int, perPage: Int ): PaginatedCategories
   }
 
   extend type Mutation {

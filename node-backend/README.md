@@ -1,4 +1,5 @@
 # Write your query or mutation here
+
 mutation createUser( $name: String!,
   $username: String!, $password: String!,
   $avatarUrl: String!, $email: String! ) {
@@ -101,8 +102,6 @@ query categories($page: Int!, $perPage: Int!) {
 }
 
 
-
-
 ##################################################################################################
 {
   "authorization" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVkYjQ2YjE1ZjhhMzIzMDRmMDI2NGM5MSIsImlhdCI6MTU3MjE5MzU4MSwiZXhwIjoxNTcyMjA1NTgxfQ.MI3oRJW5AROswzNjdzKW9hxp7G9WotTQyJdfuP0BWcE"
@@ -125,7 +124,6 @@ query categories($page: Int!, $perPage: Int!) {
 //   "email": "kumara.suresh25@gmail.com",
 //   "password": "pass"
 // }
-
 
 {
   "page": 1,

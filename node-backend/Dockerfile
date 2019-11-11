@@ -11,7 +11,7 @@ WORKDIR /usr/src/app
 RUN npm install -g nodemon
 EXPOSE 3000
 EXPOSE 3001
-
+EXPOSE 4000
 
 # FROM node:lts-alpine
 # RUN mkdir -p /usr/src/app

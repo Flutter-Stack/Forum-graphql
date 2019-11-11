@@ -2,7 +2,6 @@ import mongoose from 'mongoose';
 import timestamps from 'mongoose-timestamp';
 
 const PostSchema = new mongoose.Schema({
-
   body: {
     type: String,
     required: true,

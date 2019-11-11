@@ -14,6 +14,7 @@ services:
     ports:
       - 3000:3000
       - 3001:3001
+      - 4000:4000
     volumes:
       - ./node-backend/:/usr/src/app
     command: "npm config set save=true"
@@ -73,3 +74,45 @@ services:
     # MONGODB_USER: "${db_user_env}"
     # MONGODB_DATABASE: "${dbname_env}"
     # MONGODB_PASS: "${db_pass}"
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.0.1
+    container_name: es01
+    environment:
+      - node.name=es01
+      - discovery.seed_hosts=es02
+      - cluster.initial_master_nodes=es01,es02
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+#    volumes:
+#      - esdata01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - appollo-mongo
+  es02:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.0.1
+    container_name: es02
+    environment:
+      - node.name=es02
+      - discovery.seed_hosts=es01
+      - cluster.initial_master_nodes=es01,es02
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+#    volumes:
+#      - esdata02:/usr/share/elasticsearch/data
+    networks:
+      - appollo-mongo
+
+# https://www.elastic.co/guide/en/elasticsearch/reference/7.0/docker.html
+# https://www.elastic.co/blog/new-elasticsearch-javascript-client-released
+# https://www.guru99.com/elk-stack-tutorial.html

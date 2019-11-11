@@ -7,14 +7,18 @@ export default gql`
     id: ID!
     body: String!
     thread: Thread!
-    author: User!
     createdAt: DateTime!
     updatedAt: DateTime!
+    author: User!
+  }
+
+  extend type Subscription {
+    postAdded(threadId: ID!): Post
   }
 
   extend type Query {
     post(id: ID!): Post!
-    posts: [Post!]!
+    posts(threadId: ID): [Post!]!
   }
 
   extend type Mutation {

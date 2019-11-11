@@ -15,6 +15,10 @@ export default gql`
     author: User!
   }
 
+  extend type Subscription {
+    threadAdded(categoryId: ID!): Thread
+  }
+
   extend type Query {
     thread(id: ID!): Thread!
     threads: [Thread!]!

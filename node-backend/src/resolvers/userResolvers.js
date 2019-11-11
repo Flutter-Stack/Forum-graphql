@@ -31,8 +31,8 @@ export default {
       };
     },
     authenticate: async(parent, { email, password }, { models: { User }, me }, info)  => {
+
       const user = await User.findOne({ email: email }).exec();
-      console.log(user);
       if (!user) {
         throw new AuthenticationError('Invalid credentials');
       }
@@ -44,7 +44,6 @@ export default {
       }
 
       const token = jwt.sign({ id: user.id }, 'riddlemethis', { expiresIn: 24 * 10 * 50 });
-      console.log(token);
       return { token };
     }
   },
@@ -55,7 +54,7 @@ export default {
     },
   },
   User: {
-    posts: async ( { id }, args, { models: { postModel } }, info) => {
+    posts: async ( { id }, args, { models: { Post } }, info) => {
       const posts = await postModel.find({ author: id }).exec();
       return posts;
     },
