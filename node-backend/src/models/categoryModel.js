@@ -13,12 +13,10 @@ const CategorySchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  author: [
-    {
+  author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     }
-  ]
 });
 CategorySchema.plugin(timestamps);
 CategorySchema.plugin(mongoosePaginate);

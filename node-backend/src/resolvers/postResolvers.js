@@ -1,4 +1,4 @@
-import { AuthenticationError, PubSub } from 'apollo-server';
+import { AuthenticationError, PubSub } from 'apollo-server-express';
 import slugify from 'slugify-string';
 
 const pubsub = new PubSub();
@@ -11,23 +11,26 @@ export default {
       if (!me) {
         throw new AuthenticationError('You are not authenticated');
       }
-      const post = await Post.findById({ _id: id }).exec();
+      const post = await Post.findById({ _id: id }).populate('author').exec();
       return post;
     },
     posts: async (parent, { id }, { models: { Post }, me }, info) => {
       if (!me) {
         throw new AuthenticationError('You are not authenticated');
       }
-      const posts = await Post.find({ thread: id }).exec();
+      const posts = await Post.find({ thread: id }).populate('author').exec();
       return posts;
     },
   },
   Mutation: {
-    createPost: async (parent, { body, threadId }, { models: { Post }, me }, info) => {
+    createPost: async (parent, { body, threadId }, { models: { Post}, me }, info) => {
       if (!me) {
         throw new AuthenticationError('You are not authenticated');
       }
       const post = await Post.create({ body:body, thread: threadId, author: me.id  });
+      // let user = await User.create({ ... })
+      completepost = await post.populate('author').execPopulate();
+      console.log(completepost);
       pubsub.publish('POST_ADDED', { postAdded: post });
       return post;
     },
@@ -37,17 +40,17 @@ export default {
       subscribe: () =>  pubsub.asyncIterator(POST_ADDED)
     }
   },
-  Post: {
-    author: async ( { author }, args, { models: { User } }, info) => {
-      const user = await User.findById({ _id: author }).exec();
-      return user;
-      // return {
-      //   "_id": "5db46b15f8a32304f0264c91,",
-      //       "name": "test",
-      //       "avatarUrl": "test",
-      //       "email": "",
-      //       "password": "pass"
-      // }
-    },
-  },
+  // Post: {
+  //   author: async ( { author }, args, { models: { User } }, info) => {
+  //     const user = await User.findById({ _id: author }).exec();
+  //     return user;
+  //     // return {
+  //     //   "_id": "5db46b15f8a32304f0264c91,",
+  //     //       "name": "test",
+  //     //       "avatarUrl": "test",
+  //     //       "email": "",
+  //     //       "password": "pass"
+  //     // }
+  //   },
+  // },
 };

@@ -1,4 +1,4 @@
-import { ApolloServer, gql, PubSub } from "apollo-server";
+import { ApolloServer, gql, PubSub } from "apollo-server-express";
 import jwt from 'jsonwebtoken';
 import dbConfig from './config/dbConfig';
 import mongoose from 'mongoose';
@@ -8,8 +8,12 @@ import User from './models/userModel';
 import Post from './models/postModel';
 import Category from './models/categoryModel';
 import Thread from './models/threadModel';
+import http from 'http';
+import express from 'express';
+const pubsub = new PubSub();
+const app = new express();
 
-const PORT = 3000
+const PORT = 3000;
 const getUser = async (req) => {
   const token = req.headers['authorization'];
   if (token) {
@@ -24,12 +28,11 @@ const getUser = async (req) => {
 const server = new ApolloServer({
   typeDefs: schemas,
   resolvers,
-  context: async ({ req , res }) => {
-    if (req, res) {
+  context: async ({ req , connection }) => {
+    if (req) {
       const me = await getUser(req);
       return {
         req,
-        res,
         me,
         models: {
           User,
@@ -38,6 +41,8 @@ const server = new ApolloServer({
           Thread,
         },
       };
+    } else if (connection) {
+      return connection.context // this is important if you want use socket context
     }
   },
   subscriptions: {
@@ -45,7 +50,11 @@ const server = new ApolloServer({
   }
 });
 
-server.listen(PORT).then(({ url }) => {
+server.applyMiddleware({app})
+const httpServer = http.createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
+httpServer.listen(PORT, () => {
   mongoose.connect(dbConfig.url, {
       useNewUrlParser: true,
       user: dbConfig.user,
@@ -59,6 +68,6 @@ server.listen(PORT).then(({ url }) => {
       process.exit();
   });
 
-  console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`)
-  console.log(`🚀 Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`)
-});
+  console.log(`Server ready at http://localhost:${PORT}${server.graphqlPath}`)
+  console.log(`Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`)
+})

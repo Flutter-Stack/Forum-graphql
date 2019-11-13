@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { AuthenticationError } from 'apollo-server';
+import { AuthenticationError } from 'apollo-server-express';
 
 export default {
   Query: {
@@ -53,10 +53,10 @@ export default {
       return user;
     },
   },
-  User: {
-    posts: async ( { id }, args, { models: { Post } }, info) => {
-      const posts = await postModel.find({ author: id }).exec();
-      return posts;
-    },
-  },
+  // User: {
+  //   posts: async ( { id }, args, { models: { Post } }, info) => {
+  //     const posts = await postModel.find({ author: id }).exec();
+  //     return posts;
+  //   },
+  // },
 };

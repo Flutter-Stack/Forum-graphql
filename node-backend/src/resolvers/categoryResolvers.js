@@ -1,4 +1,4 @@
-import { AuthenticationError, PubSub } from 'apollo-server';
+import { AuthenticationError, PubSub } from 'apollo-server-express';
 import slugify from 'slugify-string';
 
 const pubsub = new PubSub();
@@ -11,7 +11,7 @@ export default {
       if (!me) {
         throw new AuthenticationError('You are not authenticated');
       }
-      const category = await Category.findById({ _id: id }).exec();
+      const category = await Category.findById({ _id: id }).populate('author').exec();
 
       return category;
     },
@@ -23,7 +23,7 @@ export default {
         page: page,
         limit: perPage,
       };
-      const categories = await Category.paginate({}, options);
+      const categories = await Category.paginate({}, options).populate('author');
       return {
         entries: categories.docs,
         page: categories.page,
@@ -39,6 +39,10 @@ export default {
         throw new AuthenticationError('You are not authenticated');
       }
       const category = await Category.create({ title: title, slug: slugify(title) , author: me.id });
+      // let user = await User.create({ ... })
+      // const completecategory = await category.populate('author').execPopulate();
+      // console.log(completecategory);
+      // console.log(category);
       pubsub.publish('CATEGORY_ADDED', { categoryAdded: category });
       return category;
     },
@@ -59,7 +63,7 @@ export default {
   },
   Category: {
     author: async ({ author }, args, { models: { User } }, info) => {
-      const user = await User.findById({ author }).exec();
+      const user = await User.findById({ _id: author }).exec();
       return user;
     },
     threads: async ({ id }, args, { models: { Thread } }, info) => {
