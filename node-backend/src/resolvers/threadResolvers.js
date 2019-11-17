@@ -28,9 +28,9 @@ export default {
         throw new AuthenticationError('You are not authenticated');
       }
       const thread = await Thread.create({ title : title, slug : slugify(title), category: category, body: body, author: me.id });
-      
-      pubsub.publish('THREAD_ADDED', { threadAdded: thread });
-      return thread;
+      const completethread = await thread.populate('author').execPopulate();      
+      pubsub.publish('THREAD_ADDED', { threadAdded: completethread });
+      return completethread;
     },
   },
   Subscription: {

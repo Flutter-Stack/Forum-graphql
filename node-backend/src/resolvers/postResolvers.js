@@ -28,11 +28,9 @@ export default {
         throw new AuthenticationError('You are not authenticated');
       }
       const post = await Post.create({ body:body, thread: threadId, author: me.id  });
-      // let user = await User.create({ ... })
-      completepost = await post.populate('author').execPopulate();
-      console.log(completepost);
-      pubsub.publish('POST_ADDED', { postAdded: post });
-      return post;
+      const completepost = await post.populate('author').execPopulate();
+      pubsub.publish('POST_ADDED', { postAdded: completepost });
+      return completepost;
     },
   },
   Subscription: {

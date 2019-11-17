@@ -34,17 +34,17 @@ export default {
     },
   },
   Mutation: {
-    createCategory: async (parent, { title }, { models: { Category }, me, }, info) => {
+    createCategory: async (parent, { title }, { models: { Category, }, me, }, info) => {
       if (!me) {
         throw new AuthenticationError('You are not authenticated');
       }
       const category = await Category.create({ title: title, slug: slugify(title) , author: me.id });
-      // let user = await User.create({ ... })
-      // const completecategory = await category.populate('author').execPopulate();
-      // console.log(completecategory);
-      // console.log(category);
-      pubsub.publish('CATEGORY_ADDED', { categoryAdded: category });
-      return category;
+      const completecategory = await category.populate('author').execPopulate();
+//
+          const threads = await Thread.find({ category : id }).exec();
+
+      pubsub.publish('CATEGORY_ADDED', { categoryAdded: completecategory });
+      return completecategory;
     },
   },
   Subscription: {
@@ -61,14 +61,14 @@ export default {
       // }
     }
   },
-  Category: {
-    author: async ({ author }, args, { models: { User } }, info) => {
-      const user = await User.findById({ _id: author }).exec();
-      return user;
-    },
-    threads: async ({ id }, args, { models: { Thread } }, info) => {
-      const threads = await Thread.find({ category : id }).exec();
-      return threads;
-    },
-  },
+  // Category: {
+  //   author: async ({ author }, args, { models: { User } }, info) => {
+  //     const user = await User.findById({ _id: author }).exec();
+  //     return user;
+  //   },
+  //   threads: async ({ id }, args, { models: { Thread } }, info) => {
+  //     const threads = await Thread.find({ category : id }).exec();
+  //     return threads;
+  //   },
+  // },
 };
