@@ -53,8 +53,12 @@ const server = new ApolloServer({
 server.applyMiddleware({app})
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
 
 httpServer.listen(PORT, () => {
+
   mongoose.connect(dbConfig.url, {
       useNewUrlParser: true,
       user: dbConfig.user,
